@@ -1,0 +1,402 @@
+[
+  {
+    "id": 1,
+    "name": "Push-Up",
+    "image": "https://media.istockphoto.com/id/578104104/es/vector/paso-a-la-instrucci%C3%B3n-en-push-up.jpg?s=612x612&w=0&k=20&c=RNxtdjWZVPjCdk6dBd4wlgNVX7qB6cPFoakeb1Mux8c=",
+    "videoUrl": "https://www.youtube.com/watch?v=_l3ySVKYVJ8",
+    "muscleGroups": "chest,triceps,shoulders,core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 2,
+    "name": "Pull-Up",
+    "image": "https://lh7-rt.googleusercontent.com/docsz/AD_4nXei6QXIsW77Dz05CSKhMVSkOZ90EBGwtm9c-SbITYJO54YfCdLdcpbPtBS0WD5P3n7koFMQlrbNfUpH7ABFRk25cfftYsht_PT3ZQSxg76R7vu2NSBuK_Bb5Sgn2c5HAnlCDc7VPg?key=1vWJ-Q9HJTU9ys4zgdnYqEh0",
+    "videoUrl": "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+    "muscleGroups": "back,biceps,shoulders,core",
+    "equipment": "pull-up bar"
+  },
+  {
+    "id": 3,
+    "name": "Squat",
+    "image": "https://enarahealth.com/wp-content/uploads/2022/03/PngItem_2810409-e1647565708516.png",
+    "videoUrl": "https://www.youtube.com/watch?v=aclHkVaku9U",
+    "muscleGroups": "quadriceps,glutes,hamstrings,core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 4,
+    "name": "Bench Press",
+    "image": "https://s3assets.skimble.com/assets/2289478/image_full.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=gRVjAtPip0Y",
+    "muscleGroups": "chest,triceps,shoulders",
+    "equipment": "barbell,bench"
+  },
+  {
+    "id": 5,
+    "name": "Deadlift",
+    "image": "https://training.fit/wp-content/uploads/2020/03/kreuzheben-gestreckte-beine.png",
+    "videoUrl": "https://www.youtube.com/watch?v=op9kVnSso6Q",
+    "muscleGroups": "back,glutes,hamstrings,core",
+    "equipment": "barbell"
+  },
+  {
+    "id": 6,
+    "name": "Shoulder Press",
+    "image": "https://liftmanual.com/wp-content/uploads/2023/04/lever-seated-shoulder-press.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=B-aVuyhvLHU",
+    "muscleGroups": "shoulders,triceps,core",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 7,
+    "name": "Bicep Curl",
+    "image": "https://training.fit/wp-content/uploads/2018/12/bizepscurls.png",
+    "videoUrl": "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+    "muscleGroups": "biceps",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 8,
+    "name": "Tricep Dip",
+    "image": "https://www.inspireusafoundation.org/wp-content/uploads/2023/01/tricep-dip-muscles.png",
+    "videoUrl": "https://www.youtube.com/watch?v=0326dy_-CzM",
+    "muscleGroups": "triceps,chest,shoulders",
+    "equipment": "parallel bars,bench"
+  },
+  {
+    "id": 9,
+    "name": "Lunge",
+    "image": "https://trainingstation.co.uk/cdn/shop/articles/Lunges-movment_d958998d-2a9f-430e-bdea-06f1e2bcc835_900x.webp?v=1741687877",
+    "videoUrl": "https://www.youtube.com/watch?v=QOVaHwm-Q6U",
+    "muscleGroups": "quadriceps,glutes,hamstrings,core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 10,
+    "name": "Plank",
+    "image": "https://www.inspireusafoundation.org/wp-content/uploads/2023/07/plank-benefits.png",
+    "videoUrl": "https://www.youtube.com/watch?v=pSHjTRCQxIw",
+    "muscleGroups": "core,shoulders,glutes",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 11,
+    "name": "Lat Pulldown",
+    "image": "https://www.inspireusafoundation.org/wp-content/uploads/2021/10/lat-pulldown-1024x797.png",
+    "videoUrl": "https://www.youtube.com/watch?v=CAwf7n6Luuc",
+    "muscleGroups": "back,biceps,shoulders",
+    "equipment": "lat pulldown machine"
+  },
+  {
+    "id": 12,
+    "name": "Seated Row",
+    "image": "https://s3assets.skimble.com/assets/2788624/image_full.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=GZbfZ033f74",
+    "muscleGroups": "back,biceps",
+    "equipment": "cable machine"
+  },
+  {
+    "id": 13,
+    "name": "Leg Press",
+    "image": "https://kinxlearning.com/cdn/shop/files/exercise-16_1000x.jpg?v=1613154729",
+    "videoUrl": "https://www.youtube.com/watch?v=IZxyjW7MPJQ",
+    "muscleGroups": "quadriceps,glutes,hamstrings",
+    "equipment": "leg press machine"
+  },
+  {
+    "id": 14,
+    "name": "Leg Extension",
+    "image": "https://cdn.shopify.com/s/files/1/0269/5551/3900/files/Leg-Extension_41d91d3f-4b9c-4374-82e2-1d697ce35fe4_600x600.png?v=1612138862",
+    "videoUrl": "https://www.youtube.com/watch?v=8iPEnn-ltC8",
+    "muscleGroups": "quadriceps",
+    "equipment": "leg extension machine"
+  },
+  {
+    "id": 15,
+    "name": "Leg Curl",
+    "image": "https://file.hstatic.net/200000623631/file/leg-curl__2__b9794f98cd2941318e86856d4bf9de8d.png",
+    "videoUrl": "https://www.youtube.com/watch?v=1Tq3QdYUuHs",
+    "muscleGroups": "hamstrings",
+    "equipment": "leg curl machine"
+  },
+  {
+    "id": 16,
+    "name": "Calf Raise",
+    "image": "https://ashleysteele.com/cdn/shop/articles/Elevated_Calf_Raise_DB_1000x.jpg?v=1598037932",
+    "videoUrl": "https://www.youtube.com/watch?v=-M4-G8p8fmc",
+    "muscleGroups": "calves",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 17,
+    "name": "Chest Fly",
+    "image": "https://training.fit/wp-content/uploads/2020/02/butterflys-800x448.png",
+    "videoUrl": "https://www.youtube.com/watch?v=eozdVDA78K0",
+    "muscleGroups": "chest,shoulders",
+    "equipment": "dumbbells,bench"
+  },
+  {
+    "id": 18,
+    "name": "Incline Bench Press",
+    "image": "https://image.myupchar.com/9694/webp/incline-bench-press-benefits-types-technique.webp",
+    "videoUrl": "https://www.youtube.com/watch?v=SrqOu55lrYU",
+    "muscleGroups": "chest,shoulders,triceps",
+    "equipment": "barbell,bench"
+  },
+  {
+    "id": 19,
+    "name": "Decline Bench Press",
+    "image": "https://www.inspireusafoundation.org/wp-content/uploads/2021/10/decline-bench-press-1024x566.png",
+    "videoUrl": "https://www.youtube.com/watch?v=YCSb23unK6k",
+    "muscleGroups": "chest,shoulders,triceps",
+    "equipment": "barbell,bench"
+  },
+  {
+    "id": 20,
+    "name": "Hammer Curl",
+    "image": "https://liftmanual.com/wp-content/uploads/2023/04/dumbbell-cross-body-hammer-curl.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+    "muscleGroups": "biceps,forearms",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 21,
+    "name": "Skullcrusher",
+    "image": "https://www.google.com/search?tbm=isch&q=Skullcrusher",
+    "videoUrl": "https://www.youtube.com/watch?v=d_KZxkY_0cM",
+    "muscleGroups": "triceps",
+    "equipment": "barbell,bench"
+  },
+  {
+    "id": 22,
+    "name": "Overhead Tricep Extension",
+    "image": "https://www.google.com/search?tbm=isch&q=Overhead Tricep Extension",
+    "videoUrl": "https://www.youtube.com/watch?v=YbX7Wd8jQ-Q",
+    "muscleGroups": "triceps",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 23,
+    "name": "Face Pull",
+    "image": "https://www.google.com/search?tbm=isch&q=Face Pull",
+    "videoUrl": "https://www.youtube.com/watch?v=rep-qVOkqgk",
+    "muscleGroups": "shoulders,upper back",
+    "equipment": "cable machine"
+  },
+  {
+    "id": 24,
+    "name": "Rear Delt Fly",
+    "image": "https://www.google.com/search?tbm=isch&q=Rear Delt Fly",
+    "videoUrl": "https://www.youtube.com/watch?v=pDTHS9jhxAs",
+    "muscleGroups": "shoulders,upper back",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 25,
+    "name": "Russian Twist",
+    "image": "https://www.google.com/search?tbm=isch&q=Russian Twist",
+    "videoUrl": "https://www.youtube.com/watch?v=wkD8rjkodUI",
+    "muscleGroups": "core,obliques",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 26,
+    "name": "Mountain Climber",
+    "image": "https://www.google.com/search?tbm=isch&q=Mountain Climber",
+    "videoUrl": "https://www.youtube.com/watch?v=nmwgirgXLYM",
+    "muscleGroups": "core,shoulders,legs",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 27,
+    "name": "Burpee",
+    "image": "https://www.google.com/search?tbm=isch&q=Burpee",
+    "videoUrl": "https://www.youtube.com/watch?v=TU8QYVW0gDU",
+    "muscleGroups": "full body",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 28,
+    "name": "Crunch",
+    "image": "https://www.google.com/search?tbm=isch&q=Crunch",
+    "videoUrl": "https://www.youtube.com/watch?v=Xyd_fa5zoEU",
+    "muscleGroups": "core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 29,
+    "name": "Sit-Up",
+    "image": "https://www.google.com/search?tbm=isch&q=Sit-Up",
+    "videoUrl": "https://www.youtube.com/watch?v=1fbU_MkV7NE",
+    "muscleGroups": "core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 30,
+    "name": "Hanging Leg Raise",
+    "image": "https://www.google.com/search?tbm=isch&q=Hanging Leg Raise",
+    "videoUrl": "https://www.youtube.com/watch?v=JB2oyawG9KI",
+    "muscleGroups": "core,hip flexors",
+    "equipment": "pull-up bar"
+  },
+  {
+    "id": 31,
+    "name": "Farmer's Walk",
+    "image": "https://www.google.com/search?tbm=isch&q=Farmer's Walk",
+    "videoUrl": "https://www.youtube.com/watch?v=6xwGFn-J_QA",
+    "muscleGroups": "full body,grip,core",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 32,
+    "name": "Goblet Squat",
+    "image": "https://www.google.com/search?tbm=isch&q=Goblet Squat",
+    "videoUrl": "https://www.youtube.com/watch?v=6xwGFn-J_QA",
+    "muscleGroups": "quadriceps,glutes,core",
+    "equipment": "dumbbell"
+  },
+  {
+    "id": 33,
+    "name": "Step-Up",
+    "image": "https://www.google.com/search?tbm=isch&q=Step-Up",
+    "videoUrl": "https://www.youtube.com/watch?v=dQqApCGd5Ss",
+    "muscleGroups": "quadriceps,glutes,hamstrings",
+    "equipment": "bench"
+  },
+  {
+    "id": 34,
+    "name": "Hip Thrust",
+    "image": "https://www.google.com/search?tbm=isch&q=Hip Thrust",
+    "videoUrl": "https://www.youtube.com/watch?v=LM8XHLYJoYs",
+    "muscleGroups": "glutes,hamstrings,core",
+    "equipment": "barbell,bench"
+  },
+  {
+    "id": 35,
+    "name": "Donkey Kick",
+    "image": "https://www.google.com/search?tbm=isch&q=Donkey Kick",
+    "videoUrl": "https://www.youtube.com/watch?v=Uv6j1O1M9aI",
+    "muscleGroups": "glutes,hamstrings",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 36,
+    "name": "Glute Bridge",
+    "image": "https://www.google.com/search?tbm=isch&q=Glute Bridge",
+    "videoUrl": "https://www.youtube.com/watch?v=m2Zx-57cSok",
+    "muscleGroups": "glutes,hamstrings,core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 37,
+    "name": "Cable Tricep Pushdown",
+    "image": "https://www.google.com/search?tbm=isch&q=Cable Tricep Pushdown",
+    "videoUrl": "https://www.youtube.com/watch?v=2-LAMcpzODU",
+    "muscleGroups": "triceps",
+    "equipment": "cable machine"
+  },
+  {
+    "id": 38,
+    "name": "Cable Bicep Curl",
+    "image": "https://www.google.com/search?tbm=isch&q=Cable Bicep Curl",
+    "videoUrl": "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+    "muscleGroups": "biceps",
+    "equipment": "cable machine"
+  },
+  {
+    "id": 39,
+    "name": "Preacher Curl",
+    "image": "https://www.google.com/search?tbm=isch&q=Preacher Curl",
+    "videoUrl": "https://www.youtube.com/watch?v=2Jrv_kGqQjI",
+    "muscleGroups": "biceps",
+    "equipment": "barbell,preacher bench"
+  },
+  {
+    "id": 40,
+    "name": "Arnold Press",
+    "image": "https://www.google.com/search?tbm=isch&q=Arnold Press",
+    "videoUrl": "https://www.youtube.com/watch?v=vj2w851ZHRM",
+    "muscleGroups": "shoulders,triceps",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 41,
+    "name": "Lateral Raise",
+    "image": "https://www.google.com/search?tbm=isch&q=Lateral Raise",
+    "videoUrl": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "muscleGroups": "shoulders",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 42,
+    "name": "Front Raise",
+    "image": "https://www.google.com/search?tbm=isch&q=Front Raise",
+    "videoUrl": "https://www.youtube.com/watch?v=-t7fuZ0KhDA",
+    "muscleGroups": "shoulders",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 43,
+    "name": "Shrug",
+    "image": "https://www.google.com/search?tbm=isch&q=Shrug",
+    "videoUrl": "https://www.youtube.com/watch?v=6TSP1TRMUzs",
+    "muscleGroups": "traps,shoulders",
+    "equipment": "dumbbells"
+  },
+  {
+    "id": 44,
+    "name": "Reverse Crunch",
+    "image": "https://www.google.com/search?tbm=isch&q=Reverse Crunch",
+    "videoUrl": "https://www.youtube.com/watch?v=hyv14e2QDq0",
+    "muscleGroups": "core,lower abs",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 45,
+    "name": "Cable Woodchopper",
+    "image": "https://www.google.com/search?tbm=isch&q=Cable Woodchopper",
+    "videoUrl": "https://www.youtube.com/watch?v=Qp6U0FjQy9I",
+    "muscleGroups": "core,obliques",
+    "equipment": "cable machine"
+  },
+  {
+    "id": 46,
+    "name": "Medicine Ball Slam",
+    "image": "https://www.google.com/search?tbm=isch&q=Medicine Ball Slam",
+    "videoUrl": "https://www.youtube.com/watch?v=F4bKkGJ9p6k",
+    "muscleGroups": "core,shoulders,arms",
+    "equipment": "medicine ball"
+  },
+  {
+    "id": 47,
+    "name": "Box Jump",
+    "image": "https://www.google.com/search?tbm=isch&q=Box Jump",
+    "videoUrl": "https://www.youtube.com/watch?v=52r_Ul5kq2c",
+    "muscleGroups": "legs,glutes,core",
+    "equipment": "plyo box"
+  },
+  {
+    "id": 48,
+    "name": "Jump Rope",
+    "image": "https://www.google.com/search?tbm=isch&q=Jump Rope",
+    "videoUrl": "https://www.youtube.com/watch?v=1BZMwQ6yC6o",
+    "muscleGroups": "full body,cardio",
+    "equipment": "jump rope"
+  },
+  {
+    "id": 49,
+    "name": "Wall Sit",
+    "image": "https://www.google.com/search?tbm=isch&q=Wall Sit",
+    "videoUrl": "https://www.youtube.com/watch?v=-cdph8hv0O0",
+    "muscleGroups": "quadriceps,glutes,hamstrings,core",
+    "equipment": "bodyweight"
+  },
+  {
+    "id": 50,
+    "name": "Superman",
+    "image": "https://www.google.com/search?tbm=isch&q=Superman",
+    "videoUrl": "https://www.youtube.com/watch?v=z6PJMT2y8GQ",
+    "muscleGroups": "lower back,glutes,shoulders",
+    "equipment": "bodyweight"
+  }
+]
