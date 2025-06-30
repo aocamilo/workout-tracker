@@ -42,7 +42,19 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
-import type { User } from "@/server/db/schema";
+import type {
+  User,
+  UserConfig,
+  UserGoal,
+  TrainingConfig,
+} from "@/server/db/schema";
+import { api } from "@/trpc/react";
+
+type UserWithRelations = User & {
+  userConfig: UserConfig | null;
+  userGoals: UserGoal | null;
+  trainingConfig: TrainingConfig | null;
+};
 
 // Mock data based on your schema
 const mockUsers = [
@@ -203,8 +215,22 @@ const mockWorkouts = [
 ];
 
 export default function AssignRoutinesPage() {
+  const {
+    data: users = [],
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+  } = api.user.getUsers.useQuery();
+  const {
+    data: exercises = [],
+    isLoading: isLoadingExercises,
+    isError: isErrorExercises,
+  } = api.exercise.getExercises.useQuery();
+
+  console.log(users);
+  console.log(exercises);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedWorkout, setSelectedWorkout] = useState<unknown>(null);
   const [filterLevel, setFilterLevel] = useState("all");
   const [filterGoal, setFilterGoal] = useState("all");
@@ -215,17 +241,12 @@ export default function AssignRoutinesPage() {
   // Add new state variables after the existing ones
   const [selectedDay, setSelectedDay] = useState("");
 
-  const filteredUsers = mockUsers.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLevel =
-      filterLevel === "all" ||
-      user.trainingConfig.experienceLevel === filterLevel;
-    const matchesGoal =
-      filterGoal === "all" || user.goals.primaryGoal === filterGoal;
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = user.email
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesLevel && matchesGoal;
+    return matchesSearch;
   });
 
   const getUserAssignedWorkouts = (userId: string) => {
@@ -290,35 +311,6 @@ export default function AssignRoutinesPage() {
 
   return (
     <div className="bg-background flex min-h-screen flex-col">
-      {/* Header */}
-      <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <Dumbbell className="text-primary h-6 w-6" />
-              <span className="text-xl font-bold">FitTracker Admin</span>
-            </Link>
-            <nav className="hidden items-center space-x-6 text-sm font-medium md:flex">
-              <Link
-                href="/dashboard"
-                className="hover:text-primary transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link href="/admin/assign-routines" className="text-primary">
-                Assign Routines
-              </Link>
-              <Link
-                href="/admin/users"
-                className="hover:text-primary transition-colors"
-              >
-                Manage Users
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
       <main className="container flex-1 py-6">
         <div className="flex flex-col space-y-6">
           {/* Header */}
@@ -401,18 +393,17 @@ export default function AssignRoutinesPage() {
                             ? "border-primary bg-primary/5"
                             : "hover:bg-muted/50"
                         }`}
-                        //@ts-expect-error - TODO: FIX user is of type User
                         onClick={() => setSelectedUser(user)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
                               <AvatarImage
-                                src={user.image || "/placeholder.svg"}
-                                alt={user.name}
+                                src={user.image ?? "/placeholder.svg"}
+                                alt={user.email}
                               />
                               <AvatarFallback>
-                                {user.name
+                                {user.email
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")}
@@ -427,10 +418,12 @@ export default function AssignRoutinesPage() {
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">
-                              {user.trainingConfig.experienceLevel}
+                              {user.trainingConfig?.experienceLevel ??
+                                "Not set"}
                             </Badge>
                             <Badge variant="secondary">
-                              {user.goals.primaryGoal.replace("_", " ")}
+                              {user.userGoals?.primaryGoal.replace("_", " ") ??
+                                "No goal"}
                             </Badge>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -458,7 +451,7 @@ export default function AssignRoutinesPage() {
                               <div>
                                 <p className="text-muted-foreground">Age</p>
                                 <p className="font-medium">
-                                  {user.config.age} years
+                                  {user.userConfig?.age ?? "Not set"} years
                                 </p>
                               </div>
                               <div>
@@ -466,7 +459,9 @@ export default function AssignRoutinesPage() {
                                   Training Frequency
                                 </p>
                                 <p className="font-medium">
-                                  {user.trainingConfig.trainingFrequency}x/week
+                                  {user.trainingConfig?.trainingFrequency ??
+                                    "Not set"}
+                                  x/week
                                 </p>
                               </div>
                               <div>
@@ -474,7 +469,9 @@ export default function AssignRoutinesPage() {
                                   Session Duration
                                 </p>
                                 <p className="font-medium">
-                                  {user.trainingConfig.workoutDuration} min
+                                  {user.trainingConfig?.workoutDuration ??
+                                    "Not set"}{" "}
+                                  min
                                 </p>
                               </div>
                               <div>
@@ -482,7 +479,10 @@ export default function AssignRoutinesPage() {
                                   Activity Level
                                 </p>
                                 <p className="font-medium">
-                                  {user.config.activityLevel.replace("_", " ")}
+                                  {user.userConfig?.activityLevel.replace(
+                                    "_",
+                                    " ",
+                                  ) ?? "Not set"}
                                 </p>
                               </div>
                             </div>
@@ -533,8 +533,10 @@ export default function AssignRoutinesPage() {
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Goal:</span>
                           <span className="font-medium">
-                            {/* {selectedUser.goals.primaryGoal.replace("_", " ")} */}
-                            goals
+                            {selectedUser.userGoals?.primaryGoal.replace(
+                              "_",
+                              " ",
+                            ) ?? "Not set"}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -542,8 +544,8 @@ export default function AssignRoutinesPage() {
                             Experience:
                           </span>
                           <span className="font-medium">
-                            {/* {selectedUser.trainingConfig.experienceLevel} */}
-                            experienceLevel
+                            {selectedUser.trainingConfig?.experienceLevel ??
+                              "Not set"}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -551,8 +553,8 @@ export default function AssignRoutinesPage() {
                             Target Weight:
                           </span>
                           <span className="font-medium">
-                            {/* {selectedUser.goals.targetWeight} kg */}
-                            targetWeight
+                            {selectedUser.userGoals?.targetWeight ?? "Not set"}{" "}
+                            kg
                           </span>
                         </div>
                       </div>

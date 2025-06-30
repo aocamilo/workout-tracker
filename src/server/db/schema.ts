@@ -48,8 +48,20 @@ export const users = createTable("user", (d) => ({
   image: d.varchar({ length: 255 }),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
+  userConfig: one(userConfig, {
+    fields: [users.id],
+    references: [userConfig.userId],
+  }),
+  userGoals: one(userGoals, {
+    fields: [users.id],
+    references: [userGoals.userId],
+  }),
+  trainingConfig: one(trainingConfig, {
+    fields: [users.id],
+    references: [trainingConfig.userId],
+  }),
 }));
 
 export const accounts = createTable(

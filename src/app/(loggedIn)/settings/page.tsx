@@ -23,6 +23,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { api } from "@/trpc/react";
 import {
   Activity,
   Calculator,
@@ -84,23 +85,54 @@ const user = {
 };
 
 export default function UserSettings() {
+  const { data: userConfig } = api.userConfig.getUserConfig.useQuery();
+  const { data: userGoal } = api.userGoal.getUserGoal.useQuery();
+  const { data: trainingConfig } =
+    api.trainingConfig.getTrainingConfig.useQuery();
+
+  const saveUserConfig = api.userConfig.create.useMutation();
+  const saveUserGoal = api.userGoal.create.useMutation();
+  const saveTrainingConfig = api.trainingConfig.create.useMutation();
+
   const [profile, setProfile] = useState<UserProfile>({
-    age: 28,
-    gender: "male",
-    weight: 75,
-    height: 175,
-    targetWeight: 70,
-    weightUnit: "kg",
-    heightUnit: "cm",
-    primaryGoal: "lose_weight",
-    targetDate: "",
-    activityLevel: "moderately_active",
-    trainingFrequency: 4,
-    workoutDuration: 45,
-    experienceLevel: "intermediate",
-    preferredWorkoutTypes: ["strength", "cardio"],
-    availableEquipment: ["dumbbells", "barbell"],
-    timePreference: "evening",
+    age: userConfig?.age ?? 28,
+    gender: (userConfig?.gender as "male" | "female" | "other") ?? "male",
+    weight: userConfig?.weight ?? 75,
+    height: userConfig?.height ?? 175,
+    targetWeight: userGoal?.targetWeight ?? 70,
+    weightUnit: (userConfig?.weightUnit as "kg" | "lbs") ?? "kg",
+    heightUnit: (userConfig?.heightUnit as "cm" | "ft") ?? "cm",
+    primaryGoal:
+      (userGoal?.primaryGoal as
+        | "lose_weight"
+        | "gain_muscle"
+        | "maintain"
+        | "improve_endurance"
+        | "general_fitness") ?? "lose_weight",
+    targetDate: userGoal?.targetDate.toISOString() ?? new Date().toISOString(),
+    activityLevel:
+      (userConfig?.activityLevel as
+        | "sedentary"
+        | "lightly_active"
+        | "moderately_active"
+        | "very_active"
+        | "extremely_active") ?? "moderately_active",
+    trainingFrequency: trainingConfig?.trainingFrequency ?? 4,
+    workoutDuration: trainingConfig?.workoutDuration ?? 45,
+    experienceLevel:
+      (trainingConfig?.experienceLevel as
+        | "beginner"
+        | "intermediate"
+        | "advanced") ?? "intermediate",
+    timePreference:
+      (trainingConfig?.timePreference as
+        | "morning"
+        | "afternoon"
+        | "evening"
+        | "flexible") ?? "evening",
+    preferredWorkoutTypes:
+      trainingConfig?.preferredWorkoutTypes.split(",") ?? [],
+    availableEquipment: trainingConfig?.availableEquipment.split(",") ?? [],
   });
 
   const [calculations, setCalculations] = useState({
@@ -184,10 +216,37 @@ export default function UserSettings() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSaving(false);
-    // Show success message or redirect
+    try {
+      await Promise.all([
+        saveUserConfig.mutateAsync({
+          weightUnit: profile.weightUnit,
+          heightUnit: profile.heightUnit,
+          age: profile.age,
+          gender: profile.gender,
+          weight: profile.weight,
+          height: profile.height,
+          activityLevel: profile.activityLevel,
+          lang: "en",
+        }),
+        saveUserGoal.mutateAsync({
+          primaryGoal: profile.primaryGoal,
+          targetDate: new Date(profile.targetDate),
+          targetWeight: profile.targetWeight,
+        }),
+        saveTrainingConfig.mutateAsync({
+          trainingFrequency: profile.trainingFrequency,
+          workoutDuration: profile.workoutDuration,
+          experienceLevel: profile.experienceLevel,
+          timePreference: profile.timePreference,
+          preferredWorkoutTypes: profile.preferredWorkoutTypes.join(","),
+          availableEquipment: profile.availableEquipment.join(","),
+        }),
+      ]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
