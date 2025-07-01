@@ -2,9 +2,9 @@ import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { userRouter } from "./routers/user";
 import { exerciseRouter } from "./routers/exercise";
-import { userConfigRouter } from "./routers/userConfig";
-import { trainingConfigRouter } from "./routers/trainingConfig";
-import { userGoalRouter } from "./routers/userGoal";
+import { userConfigRouter } from "./routers/user-config";
+import { trainingConfigRouter } from "./routers/training-config";
+import { userGoalRouter } from "./routers/user-goal";
 
 /**
  * This is the primary router for your server.

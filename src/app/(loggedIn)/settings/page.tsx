@@ -85,10 +85,10 @@ const user = {
 };
 
 export default function UserSettings() {
-  const { data: userConfig } = api.userConfig.getUserConfig.useQuery();
-  const { data: userGoal } = api.userGoal.getUserGoal.useQuery();
-  const { data: trainingConfig } =
-    api.trainingConfig.getTrainingConfig.useQuery();
+  const [userConfig] = api.userConfig.getUserConfig.useSuspenseQuery();
+  const [userGoal] = api.userGoal.getUserGoal.useSuspenseQuery();
+  const [trainingConfig] =
+    api.trainingConfig.getTrainingConfig.useSuspenseQuery();
 
   const saveUserConfig = api.userConfig.create.useMutation();
   const saveUserGoal = api.userGoal.create.useMutation();
