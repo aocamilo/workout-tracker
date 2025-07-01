@@ -4,15 +4,21 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { userConfig } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
-const userConfigSchema = z.object({
-  weightUnit: z.string(),
-  heightUnit: z.string(),
+export const userConfigSchema = z.object({
+  weightUnit: z.enum(["kg", "lbs"]),
+  heightUnit: z.enum(["cm", "ft"]),
   age: z.number(),
-  gender: z.string(),
+  gender: z.enum(["male", "female", "other"]),
   weight: z.number(),
   height: z.number(),
-  activityLevel: z.string(),
-  lang: z.string(),
+  activityLevel: z.enum([
+    "sedentary",
+    "lightly_active",
+    "moderately_active",
+    "very_active",
+    "extremely_active",
+  ]),
+  lang: z.enum(["en", "es"]).optional(),
 });
 
 export const userConfigRouter = createTRPCRouter({
@@ -26,9 +32,21 @@ export const userConfigRouter = createTRPCRouter({
   create: protectedProcedure
     .input(userConfigSchema)
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(userConfig).values({
-        userId: ctx.session.user.id,
-        ...input,
+      const existingEntry = await ctx.db.query.userConfig.findFirst({
+        where: eq(userConfig.userId, ctx.session.user.id),
       });
+
+      if (existingEntry) {
+        await ctx.db
+          .update(userConfig)
+          .set({ ...input, lang: input.lang ?? "en" })
+          .where(eq(userConfig.userId, ctx.session.user.id));
+      } else {
+        await ctx.db.insert(userConfig).values({
+          userId: ctx.session.user.id,
+          ...input,
+          lang: input.lang ?? "en",
+        });
+      }
     }),
 });

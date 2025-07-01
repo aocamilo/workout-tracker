@@ -159,6 +159,7 @@ export const trainingConfig = createTable("training_config", (d) => ({
   userId: d
     .varchar({ length: 255 })
     .notNull()
+    .unique()
     .references(() => users.id),
   trainingFrequency: d.integer().notNull(),
   workoutDuration: d.integer().notNull(),
