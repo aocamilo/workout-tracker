@@ -26,6 +26,8 @@ import {
   Zap,
 } from "lucide-react";
 import { WelcomeBack } from "./_components/welcome-back";
+import { api } from "@/trpc/server";
+import { redirect } from "next/navigation";
 
 // Mock data
 const mockUser = {
@@ -102,7 +104,15 @@ const weeklyStats = [
   { day: "Sun", completed: false },
 ];
 
-export default function WorkoutDashboard() {
+export default async function WorkoutDashboard() {
+  const userConfig = await api.userConfig.getUserConfig();
+  const userGoal = await api.userGoal.getUserGoal();
+  const trainingConfig = await api.trainingConfig.getTrainingConfig();
+
+  if (!userConfig || !userGoal || !trainingConfig) {
+    redirect("/settings");
+  }
+
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <main className="container flex-1 py-6">

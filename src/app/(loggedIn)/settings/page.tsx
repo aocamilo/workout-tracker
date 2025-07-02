@@ -26,9 +26,14 @@ export default async function UserSettings({
 
   const activeTab = tab && validTabs.includes(tab) ? tab : "personal";
 
-  if (userConfig !== null && goals === null) {
+  if (userConfig !== null && goals === null && tab !== "goals") {
     redirect("/settings?tab=goals");
-  } else if (userConfig !== null && goals !== null && trainingConfig === null) {
+  } else if (
+    userConfig !== null &&
+    goals !== null &&
+    trainingConfig === null &&
+    tab !== "training"
+  ) {
     redirect("/settings?tab=training");
   }
 
