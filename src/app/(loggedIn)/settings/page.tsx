@@ -4,11 +4,33 @@ import { SidePanel } from "./_components/side-panel";
 import { TrainingConfigForm } from "./_components/training-config-form";
 import { UserConfigForm } from "./_components/user-config-form";
 import { api } from "@/trpc/server";
+import { redirect } from "next/navigation";
 
-export default async function UserSettings() {
+const validTabs = ["personal", "goals", "training"];
+
+export default async function UserSettings({
+  searchParams,
+}: {
+  searchParams?: {
+    tab?: string;
+  };
+}) {
   const userConfig = await api.userConfig.getUserConfig();
   const goals = await api.userGoal.getUserGoal();
   const trainingConfig = await api.trainingConfig.getTrainingConfig();
+
+  // params in nextjs should be awaited
+  // eslint-disable-next-line @typescript-eslint/await-thenable
+  const params = await searchParams;
+  const tab = params?.tab ?? "personal";
+
+  const activeTab = tab && validTabs.includes(tab) ? tab : "personal";
+
+  if (userConfig !== null && goals === null) {
+    redirect("/settings?tab=goals");
+  } else if (userConfig !== null && goals !== null && trainingConfig === null) {
+    redirect("/settings?tab=training");
+  }
 
   return (
     <div className="bg-background flex min-h-screen flex-col">
@@ -28,7 +50,7 @@ export default async function UserSettings() {
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Settings Form */}
             <div className="lg:col-span-2">
-              <Tabs defaultValue="personal" className="space-y-6">
+              <Tabs defaultValue={activeTab} className="space-y-6">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="personal">Personal</TabsTrigger>
                   <TabsTrigger value="goals">Goals</TabsTrigger>

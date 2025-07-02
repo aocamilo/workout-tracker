@@ -2,6 +2,7 @@
 import { userGoalSchema } from "@/server/api/routers/user-goal";
 import { api } from "@/trpc/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addUserGoalAction(state: unknown, formData: FormData) {
   const targetDateValue = formData.get("targetDate") as string;
@@ -32,9 +33,6 @@ export async function addUserGoalAction(state: unknown, formData: FormData) {
   try {
     await api.userGoal.create(payload.data);
     revalidatePath("/settings");
-    return {
-      success: true,
-    };
   } catch (error) {
     console.error("Error adding training config:", error);
     return {
@@ -43,4 +41,6 @@ export async function addUserGoalAction(state: unknown, formData: FormData) {
       },
     };
   }
+
+  redirect("/settings?tab=training");
 }

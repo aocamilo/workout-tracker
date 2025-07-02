@@ -66,16 +66,6 @@ export function UserConfigForm({
 
   return (
     <form id="user-config-form" action={formAction}>
-      {state?.success && (
-        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3">
-          <div className="flex items-center gap-2 text-green-800">
-            <CheckCircle className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              Settings saved successfully!
-            </span>
-          </div>
-        </div>
-      )}
       {state?.error && getFieldError("general") && (
         <Card className="mb-4 border-red-200 bg-red-50">
           <CardContent className="pt-6">

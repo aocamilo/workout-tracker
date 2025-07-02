@@ -2,6 +2,7 @@
 import { userConfigSchema } from "@/server/api/routers/user-config";
 import { api } from "@/trpc/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addUserConfigAction(state: unknown, formData: FormData) {
   const payload = userConfigSchema.safeParse({
@@ -20,9 +21,6 @@ export async function addUserConfigAction(state: unknown, formData: FormData) {
   try {
     await api.userConfig.create(payload.data);
     revalidatePath("/settings");
-    return {
-      success: true,
-    };
   } catch (error) {
     console.error("Error adding user config:", error);
     return {
@@ -31,4 +29,5 @@ export async function addUserConfigAction(state: unknown, formData: FormData) {
       },
     };
   }
+  redirect("/settings?tab=goals");
 }
