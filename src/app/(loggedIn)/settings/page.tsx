@@ -7,6 +7,8 @@ import { api } from "@/trpc/server";
 
 export default async function UserSettings() {
   const userConfig = await api.userConfig.getUserConfig();
+  const goals = await api.userGoal.getUserGoal();
+  const trainingConfig = await api.trainingConfig.getTrainingConfig();
 
   return (
     <div className="bg-background flex min-h-screen flex-col">
@@ -40,12 +42,12 @@ export default async function UserSettings() {
 
                 {/* Goals */}
                 <TabsContent value="goals" className="space-y-6">
-                  <GoalForm />
+                  <GoalForm goals={goals} userConfig={userConfig} />
                 </TabsContent>
 
                 {/* Training */}
                 <TabsContent value="training" className="space-y-6">
-                  <TrainingConfigForm />
+                  <TrainingConfigForm trainingConfig={trainingConfig} />
                 </TabsContent>
               </Tabs>
             </div>

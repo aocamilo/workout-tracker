@@ -18,11 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { UserConfig } from "@/server/db/schema";
-import { User, AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, User } from "lucide-react";
 
+import { useActionState } from "react";
 import { addUserConfigAction } from "../actions/add-user-config";
 import SaveFormButton from "./save-form-button";
-import { useActionState } from "react";
 
 //Example: https://github.com/t3dotgg/server-actions-trpc-examples/blob/main/src/app/rsc-trpc-action/page.tsx
 export function UserConfigForm({
@@ -30,11 +30,10 @@ export function UserConfigForm({
 }: {
   userConfig: UserConfig | null;
 }) {
-  const [state, formAction] = useActionState(addUserConfigAction, null);
-
-  if (!userConfig) {
-    return null;
-  }
+  const [state, formAction, isPending] = useActionState(
+    addUserConfigAction,
+    null,
+  );
 
   // Helper function to get field errors
   const getFieldError = (fieldName: string): string | null => {
@@ -68,14 +67,14 @@ export function UserConfigForm({
   return (
     <form id="user-config-form" action={formAction}>
       {state?.success && (
-        <Card className="mb-4 border-green-200 bg-green-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-green-800">
-              <CheckCircle className="h-4 w-4" />
-              <span className="font-medium">Settings saved successfully!</span>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3">
+          <div className="flex items-center gap-2 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              Settings saved successfully!
+            </span>
+          </div>
+        </div>
       )}
       {state?.error && getFieldError("general") && (
         <Card className="mb-4 border-red-200 bg-red-50">
@@ -282,7 +281,7 @@ export function UserConfigForm({
           </div>
         </CardContent>
       </Card>
-      <SaveFormButton form="user-config-form" />
+      <SaveFormButton form="user-config-form" isPending={isPending} />
     </form>
   );
 }

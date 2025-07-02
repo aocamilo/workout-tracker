@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -9,9 +11,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import type { TrainingConfig } from "@/server/db/schema";
-import { api } from "@/trpc/server";
-import { Activity } from "lucide-react";
-import { revalidatePath } from "next/cache";
+import { Activity, AlertCircle, CheckCircle } from "lucide-react";
 
 import {
   Select,
@@ -21,21 +21,77 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Clock } from "lucide-react";
+import { useActionState, useState } from "react";
+import { addTrainingConfigAction } from "../actions/add-training-config";
 import SaveFormButton from "./save-form-button";
 
-export async function TrainingConfigForm() {
-  const trainingConfig = await api.trainingConfig.getTrainingConfig();
+export function TrainingConfigForm({
+  trainingConfig,
+}: {
+  trainingConfig: TrainingConfig | null;
+}) {
+  const [state, formAction, isPending] = useActionState(
+    addTrainingConfigAction,
+    null,
+  );
+  const [trainingFrequency, setTrainingFrequency] = useState<number[]>([
+    trainingConfig?.trainingFrequency ?? 3,
+  ]);
+  const [workoutDuration, setWorkoutDuration] = useState<number[]>([
+    trainingConfig?.workoutDuration ?? 30,
+  ]);
+
+  // Helper function to get field errors
+  const getFieldError = (fieldName: string): string | null => {
+    if (!state?.error || typeof state.error !== "object") return null;
+
+    const errorObj = state.error as Record<string, unknown>;
+    const fieldError = errorObj[fieldName];
+
+    if (Array.isArray(fieldError)) {
+      return fieldError.join(", ");
+    }
+
+    if (
+      fieldError &&
+      typeof fieldError === "object" &&
+      "_errors" in fieldError
+    ) {
+      const errors = (fieldError as { _errors?: unknown })._errors;
+      if (Array.isArray(errors)) {
+        return errors.join(", ");
+      }
+    }
+
+    return null;
+  };
+
+  const hasFieldError = (fieldName: string) => {
+    return !!getFieldError(fieldName);
+  };
 
   return (
-    <form
-      id="training-config-form"
-      action={async (formData) => {
-        "use server";
-        const config = Object.fromEntries(formData);
-        await api.trainingConfig.create(config as unknown as TrainingConfig);
-        revalidatePath("/settings");
-      }}
-    >
+    <form id="training-config-form" action={formAction}>
+      {state?.success && (
+        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3">
+          <div className="flex items-center gap-2 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              Training settings saved successfully!
+            </span>
+          </div>
+        </div>
+      )}
+      {state?.error && getFieldError("general") && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3">
+          <div className="flex items-center gap-2 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {getFieldError("general")}
+            </span>
+          </div>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -48,18 +104,14 @@ export async function TrainingConfigForm() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            {trainingConfig ? (
-              <Label>
-                Training Frequency: {trainingConfig?.trainingFrequency} days per
-                week
-              </Label>
-            ) : (
-              <Label>Configure your training frequency</Label>
-            )}
+            <Label>
+              Training Frequency: {trainingFrequency[0]} days per week
+            </Label>
             <Slider
               id="trainingFrequency"
               name="trainingFrequency"
-              defaultValue={[trainingConfig?.trainingFrequency ?? 3]}
+              value={trainingFrequency}
+              onValueChange={setTrainingFrequency}
               max={7}
               min={1}
               step={1}
@@ -69,21 +121,23 @@ export async function TrainingConfigForm() {
               <span>1 day</span>
               <span>7 days</span>
             </div>
+            {getFieldError("trainingFrequency") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("trainingFrequency")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            {trainingConfig ? (
-              <Label>
-                Preferred Workout Duration: {trainingConfig?.workoutDuration}{" "}
-                minutes
-              </Label>
-            ) : (
-              <Label>Configure your preferred workout duration</Label>
-            )}
+            <Label>
+              Preferred Workout Duration: {workoutDuration[0]} minutes
+            </Label>
             <Slider
               id="workoutDuration"
               name="workoutDuration"
-              defaultValue={[trainingConfig?.workoutDuration ?? 30]}
+              value={workoutDuration}
+              onValueChange={setWorkoutDuration}
               max={120}
               min={15}
               step={15}
@@ -93,14 +147,16 @@ export async function TrainingConfigForm() {
               <span>15 min</span>
               <span>2 hours</span>
             </div>
+            {getFieldError("workoutDuration") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("workoutDuration")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            {trainingConfig ? (
-              <Label>Experience Level: {trainingConfig?.experienceLevel}</Label>
-            ) : (
-              <Label>Configure your experience level</Label>
-            )}
+            <Label>Experience Level</Label>
             <RadioGroup
               name="experienceLevel"
               defaultValue={trainingConfig?.experienceLevel}
@@ -136,6 +192,12 @@ export async function TrainingConfigForm() {
                 </Label>
               </div>
             </RadioGroup>
+            {getFieldError("experienceLevel") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("experienceLevel")}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -157,7 +219,11 @@ export async function TrainingConfigForm() {
               name="timePreference"
               defaultValue={trainingConfig?.timePreference}
             >
-              <SelectTrigger>
+              <SelectTrigger
+                className={
+                  hasFieldError("timePreference") ? "border-red-500" : ""
+                }
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -169,6 +235,12 @@ export async function TrainingConfigForm() {
                 <SelectItem value="flexible">Flexible</SelectItem>
               </SelectContent>
             </Select>
+            {getFieldError("timePreference") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("timePreference")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -188,6 +260,7 @@ export async function TrainingConfigForm() {
                   <input
                     type="checkbox"
                     id={type}
+                    value={type}
                     defaultChecked={trainingConfig?.preferredWorkoutTypes.includes(
                       type,
                     )}
@@ -200,6 +273,12 @@ export async function TrainingConfigForm() {
                 </div>
               ))}
             </div>
+            {getFieldError("preferredWorkoutTypes") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("preferredWorkoutTypes")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -219,6 +298,7 @@ export async function TrainingConfigForm() {
                   <input
                     type="checkbox"
                     id={equipment}
+                    value={equipment}
                     defaultChecked={trainingConfig?.availableEquipment.includes(
                       equipment,
                     )}
@@ -231,10 +311,16 @@ export async function TrainingConfigForm() {
                 </div>
               ))}
             </div>
+            {getFieldError("availableEquipment") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("availableEquipment")}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
-      <SaveFormButton form="training-config-form" />
+      <SaveFormButton form="training-config-form" isPending={isPending} />
     </form>
   );
 }

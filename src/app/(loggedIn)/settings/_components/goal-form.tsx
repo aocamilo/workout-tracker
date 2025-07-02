@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -8,27 +10,81 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { UserGoal } from "@/server/db/schema";
-import { api } from "@/trpc/server";
-import { revalidatePath } from "next/cache";
+import type { UserConfig, UserGoal } from "@/server/db/schema";
 
-import { Target } from "lucide-react";
+import { AlertCircle, CheckCircle, Target } from "lucide-react";
+import { useActionState, useState } from "react";
+import { addUserGoalAction } from "../actions/add-user-goal";
 import SaveFormButton from "./save-form-button";
 
-export async function GoalForm() {
-  const goals = await api.userGoal.getUserGoal();
-  const userConfig = await api.userConfig.getUserConfig();
+export function GoalForm({
+  goals,
+  userConfig,
+}: {
+  goals: UserGoal | null;
+  userConfig: UserConfig | null;
+}) {
+  const [state, formAction, isPending] = useActionState(
+    addUserGoalAction,
+    null,
+  );
+  const [selectedPrimaryGoal, setSelectedPrimaryGoal] = useState<string>(
+    goals?.primaryGoal ?? "",
+  );
+
+  // Helper function to get field errors
+  const getFieldError = (fieldName: string): string | null => {
+    if (!state?.error || typeof state.error !== "object") return null;
+
+    const errorObj = state.error as Record<string, unknown>;
+    const fieldError = errorObj[fieldName];
+
+    if (Array.isArray(fieldError)) {
+      return fieldError.join(", ");
+    }
+
+    if (
+      fieldError &&
+      typeof fieldError === "object" &&
+      "_errors" in fieldError
+    ) {
+      const errors = (fieldError as { _errors?: unknown })._errors;
+      if (Array.isArray(errors)) {
+        return errors.join(", ");
+      }
+    }
+
+    return null;
+  };
+
+  console.log(state);
+
+  const hasFieldError = (fieldName: string) => {
+    return !!getFieldError(fieldName);
+  };
 
   return (
-    <form
-      id="goal-form"
-      action={async (formData) => {
-        "use server";
-        const config = Object.fromEntries(formData);
-        await api.userGoal.create(config as unknown as UserGoal);
-        revalidatePath("/settings");
-      }}
-    >
+    <form id="goal-form" action={formAction}>
+      {state?.success && (
+        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3">
+          <div className="flex items-center gap-2 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              Goals saved successfully!
+            </span>
+          </div>
+        </div>
+      )}
+      {state?.error && getFieldError("general") && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3">
+          <div className="flex items-center gap-2 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {getFieldError("general")}
+            </span>
+          </div>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -46,6 +102,8 @@ export async function GoalForm() {
               name="primaryGoal"
               required
               defaultValue={goals?.primaryGoal}
+              value={selectedPrimaryGoal}
+              onValueChange={setSelectedPrimaryGoal}
               className="grid grid-cols-1 gap-4 md:grid-cols-2"
             >
               <div className="flex items-center space-x-2 rounded-lg border p-3">
@@ -107,10 +165,16 @@ export async function GoalForm() {
                 </Label>
               </div>
             </RadioGroup>
+            {getFieldError("primaryGoal") && (
+              <p className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-3 w-3" />
+                {getFieldError("primaryGoal")}
+              </p>
+            )}
           </div>
 
-          {(goals?.primaryGoal === "lose_weight" ||
-            goals?.primaryGoal === "gain_muscle") && (
+          {(selectedPrimaryGoal === "lose_weight" ||
+            selectedPrimaryGoal === "gain_muscle") && (
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="target-weight">
@@ -121,23 +185,46 @@ export async function GoalForm() {
                   id="target-weight"
                   type="number"
                   step="0.1"
-                  defaultValue={goals?.targetWeight}
+                  defaultValue={Number(goals?.targetWeight)}
+                  required
+                  className={
+                    hasFieldError("targetWeight")
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }
                 />
+                {getFieldError("targetWeight") && (
+                  <p className="flex items-center gap-1 text-sm text-red-600">
+                    <AlertCircle className="h-3 w-3" />
+                    {getFieldError("targetWeight")}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="target-date">Target Date (Optional)</Label>
+                <Label htmlFor="target-date">Target Date</Label>
                 <Input
                   id="target-date"
                   type="date"
                   name="targetDate"
-                  defaultValue={goals?.targetDate.toISOString().split("T")[0]}
+                  defaultValue={goals?.targetDate?.toISOString().split("T")[0]}
+                  className={
+                    hasFieldError("targetDate")
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }
                 />
+                {getFieldError("targetDate") && (
+                  <p className="flex items-center gap-1 text-sm text-red-600">
+                    <AlertCircle className="h-3 w-3" />
+                    {getFieldError("targetDate")}
+                  </p>
+                )}
               </div>
             </div>
           )}
         </CardContent>
       </Card>
-      <SaveFormButton form="goal-form" />
+      <SaveFormButton form="goal-form" isPending={isPending} />
     </form>
   );
 }

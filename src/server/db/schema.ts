@@ -124,6 +124,7 @@ export const userConfig = createTable("user_config", (d) => ({
   userId: d
     .varchar({ length: 255 })
     .notNull()
+    .unique()
     .references(() => users.id),
   weightUnit: d.varchar({ length: 255 }).notNull(),
   heightUnit: d.varchar({ length: 255 }).notNull(),
@@ -144,6 +145,7 @@ export const userGoals = createTable("user_goal", (d) => ({
   userId: d
     .varchar({ length: 255 })
     .notNull()
+    .unique()
     .references(() => users.id),
   primaryGoal: d.varchar({ length: 255 }).notNull(),
   targetDate: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
