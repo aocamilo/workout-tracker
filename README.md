@@ -14,4 +14,6 @@
 [] Workouts page
 [] Componentize app
 [] Use server whenever available
+[] Add muscle groups and equipment to exercises
+[] Filters everywhere
 [] Analytics

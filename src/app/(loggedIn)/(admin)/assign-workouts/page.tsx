@@ -1,19 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -30,104 +20,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Search,
-  Users,
-  Dumbbell,
-  Clock,
-  Plus,
-  MoreHorizontal,
-  CheckCircle,
-  Activity,
-  User as UserIcon,
-} from "lucide-react";
-import Link from "next/link";
-import type {
-  User,
-  UserConfig,
-  UserGoal,
-  TrainingConfig,
-} from "@/server/db/schema";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "@/trpc/react";
-
-type UserWithRelations = User & {
-  userConfig: UserConfig | null;
-  userGoals: UserGoal | null;
-  trainingConfig: TrainingConfig | null;
-};
-
-// Mock data based on your schema
-const mockUsers = [
-  {
-    id: "user-1",
-    name: "John Smith",
-    email: "john.smith@example.com",
-    image: "/placeholder.svg?height=40&width=40",
-    config: {
-      age: 28,
-      gender: "male",
-      weight: 75,
-      height: 175,
-      activityLevel: "moderately_active",
-    },
-    goals: {
-      primaryGoal: "lose_weight",
-      targetWeight: 70,
-      targetDate: "2024-06-01",
-    },
-    trainingConfig: {
-      trainingFrequency: 4,
-      workoutDuration: 45,
-      experienceLevel: "intermediate",
-    },
-  },
-  {
-    id: "user-2",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@example.com",
-    image: "/placeholder.svg?height=40&width=40",
-    config: {
-      age: 32,
-      gender: "female",
-      weight: 65,
-      height: 165,
-      activityLevel: "very_active",
-    },
-    goals: {
-      primaryGoal: "gain_muscle",
-      targetWeight: 68,
-      targetDate: "2024-08-01",
-    },
-    trainingConfig: {
-      trainingFrequency: 5,
-      workoutDuration: 60,
-      experienceLevel: "advanced",
-    },
-  },
-  {
-    id: "user-3",
-    name: "Mike Davis",
-    email: "mike.davis@example.com",
-    image: "/placeholder.svg?height=40&width=40",
-    config: {
-      age: 24,
-      gender: "male",
-      weight: 80,
-      height: 180,
-      activityLevel: "lightly_active",
-    },
-    goals: {
-      primaryGoal: "general_fitness",
-      targetWeight: 78,
-      targetDate: "2024-07-01",
-    },
-    trainingConfig: {
-      trainingFrequency: 3,
-      workoutDuration: 30,
-      experienceLevel: "beginner",
-    },
-  },
-];
+import {
+  Activity,
+  CheckCircle,
+  Clock,
+  MoreHorizontal,
+  Plus,
+  Search,
+  User as UserIcon,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
 
 // Update the mockUserWorkouts to include dayOfWeek
 const mockUserWorkouts = [
@@ -215,16 +128,8 @@ const mockWorkouts = [
 ];
 
 export default function AssignRoutinesPage() {
-  const {
-    data: users = [],
-    isLoading: isLoadingUsers,
-    isError: isErrorUsers,
-  } = api.user.getUsers.useQuery();
-  const {
-    data: exercises = [],
-    isLoading: isLoadingExercises,
-    isError: isErrorExercises,
-  } = api.exercise.getExercises.useQuery();
+  const { data: users = [] } = api.user.getUsers.useQuery();
+  const { data: exercises = [] } = api.exercise.getExercises.useQuery();
 
   console.log(users);
   console.log(exercises);

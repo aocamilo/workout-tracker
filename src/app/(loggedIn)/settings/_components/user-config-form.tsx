@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { UserConfig } from "@/server/db/schema";
-import { AlertCircle, CheckCircle, User } from "lucide-react";
+import { AlertCircle, User } from "lucide-react";
 
 import { useActionState } from "react";
 import { addUserConfigAction } from "../actions/add-user-config";

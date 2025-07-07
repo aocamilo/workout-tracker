@@ -184,14 +184,23 @@ export const exercises = createTable("exercise", (d) => ({
   equipment: d.varchar({ length: 255 }).notNull(),
 }));
 
+export const exercisesRelations = relations(exercises, ({ many }) => ({
+  workoutExercises: many(workoutExercises),
+}));
+
 export const workouts = createTable("workout", (d) => ({
   id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
   name: d.varchar({ length: 255 }).notNull(),
   duration: d.integer().notNull(),
 }));
 
+export const workoutsRelations = relations(workouts, ({ many }) => ({
+  workoutExercises: many(workoutExercises),
+}));
+
 export const workoutExercises = createTable("workout_exercise", (d) => ({
   id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: d.varchar({ length: 255 }).notNull(),
   workoutId: d
     .integer()
     .notNull()

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { UserConfig, UserGoal } from "@/server/db/schema";
 
-import { AlertCircle, CheckCircle, Target } from "lucide-react";
+import { AlertCircle, Target } from "lucide-react";
 import { useActionState, useState } from "react";
 import { addUserGoalAction } from "../actions/add-user-goal";
 import SaveFormButton from "./save-form-button";
