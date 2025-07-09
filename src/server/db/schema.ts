@@ -237,8 +237,15 @@ export const userWorkouts = createTable("user_workout", (d) => ({
     .integer()
     .notNull()
     .references(() => workouts.id),
-  date: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
-  duration: d.integer().notNull(),
+  assignedDay: d.varchar({ length: 255 }).notNull(),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: d
+    .timestamp({ withTimezone: true })
+    .$onUpdate(() => new Date())
+    .notNull(),
 }));
 
 export const userWorkoutsRelations = relations(userWorkouts, ({ one }) => ({

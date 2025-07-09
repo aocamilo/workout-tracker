@@ -29,7 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Workout } from "@/server/db/schema";
 import { api } from "@/trpc/react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   CheckCircle,
@@ -42,109 +44,47 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-// Update the mockUserWorkouts to include dayOfWeek
-const mockUserWorkouts = [
-  {
-    userId: "user-1",
-    workoutId: 1,
-    date: "2024-01-15",
-    duration: 45,
-    dayOfWeek: "monday",
-  },
-  {
-    userId: "user-1",
-    workoutId: 3,
-    date: "2024-01-17",
-    duration: 30,
-    dayOfWeek: "wednesday",
-  },
-  {
-    userId: "user-2",
-    workoutId: 2,
-    date: "2024-01-16",
-    duration: 50,
-    dayOfWeek: "tuesday",
-  },
-];
-
-// Update the mockWorkouts to include preferredDays
-const mockWorkouts = [
-  {
-    id: 1,
-    name: "Upper Body Strength",
-    duration: 45,
-    exercises: [
-      { name: "Bench Press", sets: 4, reps: 8 },
-      { name: "Pull-ups", sets: 3, reps: 10 },
-      { name: "Overhead Press", sets: 3, reps: 8 },
-      { name: "Barbell Rows", sets: 4, reps: 8 },
-    ],
-    muscleGroups: ["chest", "back", "shoulders", "arms"],
-    difficulty: "intermediate",
-    preferredDays: ["monday", "thursday"], // Suggested days for this workout
-  },
-  {
-    id: 2,
-    name: "Lower Body Power",
-    duration: 50,
-    exercises: [
-      { name: "Squats", sets: 4, reps: 6 },
-      { name: "Deadlifts", sets: 3, reps: 5 },
-      { name: "Lunges", sets: 3, reps: 12 },
-      { name: "Calf Raises", sets: 4, reps: 15 },
-    ],
-    muscleGroups: ["legs", "glutes"],
-    difficulty: "advanced",
-    preferredDays: ["tuesday", "friday"],
-  },
-  {
-    id: 3,
-    name: "HIIT Cardio",
-    duration: 30,
-    exercises: [
-      { name: "Burpees", sets: 4, reps: 10 },
-      { name: "Mountain Climbers", sets: 4, reps: 20 },
-      { name: "Jump Squats", sets: 4, reps: 15 },
-      { name: "High Knees", sets: 4, reps: 30 },
-    ],
-    muscleGroups: ["full_body"],
-    difficulty: "beginner",
-    preferredDays: ["wednesday", "saturday"],
-  },
-  {
-    id: 4,
-    name: "Full Body Circuit",
-    duration: 40,
-    exercises: [
-      { name: "Push-ups", sets: 3, reps: 12 },
-      { name: "Bodyweight Squats", sets: 3, reps: 15 },
-      { name: "Plank", sets: 3, reps: 60 },
-      { name: "Jumping Jacks", sets: 3, reps: 20 },
-    ],
-    muscleGroups: ["full_body"],
-    difficulty: "beginner",
-    preferredDays: ["monday", "wednesday", "friday"],
-  },
+const daysOfWeek = [
+  { key: "monday", label: "Monday", short: "Mon" },
+  { key: "tuesday", label: "Tuesday", short: "Tue" },
+  { key: "wednesday", label: "Wednesday", short: "Wed" },
+  { key: "thursday", label: "Thursday", short: "Thu" },
+  { key: "friday", label: "Friday", short: "Fri" },
+  { key: "saturday", label: "Saturday", short: "Sat" },
+  { key: "sunday", label: "Sunday", short: "Sun" },
 ];
 
 export default function AssignRoutinesPage() {
   const { data: users = [] } = api.user.getUsers.useQuery();
-  const { data: exercises = [] } = api.exercise.getExercises.useQuery();
-
-  console.log(users);
-  console.log(exercises);
+  const { data: workouts = [] } = api.workout.getAll.useQuery();
+  const queryClient = useQueryClient();
+  const { mutate: createUserWorkout } = api.userWorkout.create.useMutation({
+    onSuccess: async () => {
+      //should clear cache for user workouts
+      await queryClient.invalidateQueries();
+    },
+  });
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [selectedWorkout, setSelectedWorkout] = useState<unknown>(null);
+  const [selectedUser, setSelectedUser] = useState<(typeof users)[0] | null>(
+    null,
+  );
+  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
   const [filterLevel, setFilterLevel] = useState("all");
   const [filterGoal, setFilterGoal] = useState("all");
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [assignmentDate, setAssignmentDate] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
 
-  // Add new state variables after the existing ones
   const [selectedDay, setSelectedDay] = useState("");
+
+  const { data: userWorkouts = [] } = api.userWorkout.getUserWorkouts.useQuery(
+    {
+      userId: selectedUser?.id ?? "",
+    },
+    {
+      enabled: !!selectedUser,
+    },
+  );
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch = user.email
@@ -154,59 +94,36 @@ export default function AssignRoutinesPage() {
     return matchesSearch;
   });
 
-  const getUserAssignedWorkouts = (userId: string) => {
-    return mockUserWorkouts
-      .filter((uw) => uw.userId === userId)
-      .map((uw) => ({
-        ...uw,
-        workout: mockWorkouts.find((w) => w.id === uw.workoutId),
-      }));
+  const getOccupiedDays = () => {
+    return userWorkouts.map((uw) => uw.assignedDay);
   };
 
-  // Add helper functions after the existing ones
-  const daysOfWeek = [
-    { key: "monday", label: "Monday", short: "Mon" },
-    { key: "tuesday", label: "Tuesday", short: "Tue" },
-    { key: "wednesday", label: "Wednesday", short: "Wed" },
-    { key: "thursday", label: "Thursday", short: "Thu" },
-    { key: "friday", label: "Friday", short: "Fri" },
-    { key: "saturday", label: "Saturday", short: "Sat" },
-    { key: "sunday", label: "Sunday", short: "Sun" },
-  ];
-
-  const getOccupiedDays = (userId: string) => {
-    return mockUserWorkouts
-      .filter((uw) => uw.userId === userId)
-      .map((uw) => uw.dayOfWeek);
-  };
-
-  const getAvailableDays = (userId: string) => {
-    const occupiedDays = getOccupiedDays(userId);
+  const getAvailableDays = () => {
+    const occupiedDays = getOccupiedDays();
     return daysOfWeek.filter((day) => !occupiedDays.includes(day.key));
   };
 
   const getWorkoutForDay = (userId: string, dayOfWeek: string) => {
-    const userWorkout = mockUserWorkouts.find(
-      (uw) => uw.userId === userId && uw.dayOfWeek === dayOfWeek,
+    const userWorkout = userWorkouts.find(
+      (uw) => uw.userId === userId && uw.assignedDay === dayOfWeek,
     );
     if (!userWorkout) return null;
     return {
       ...userWorkout,
-      workout: mockWorkouts.find((w) => w.id === userWorkout.workoutId),
+      workout: workouts.find((w) => w.id === userWorkout.workoutId),
     };
   };
 
-  // Update the handleAssignWorkout function
   const handleAssignWorkout = async () => {
     if (!selectedUser || !selectedWorkout || !selectedDay) return;
 
     setIsAssigning(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Here you would make the actual API call to assign the workout
-    // POST /api/user-workouts with { userId, workoutId, dayOfWeek }
+    createUserWorkout({
+      userId: selectedUser.id,
+      workoutId: selectedWorkout.id,
+      assignedDay: selectedDay,
+    });
 
     setIsAssigning(false);
     setIsAssignDialogOpen(false);
@@ -501,8 +418,7 @@ export default function AssignRoutinesPage() {
                                         {dayWorkout.workout?.name}
                                       </p>
                                       <p className="text-muted-foreground text-xs">
-                                        {dayWorkout.workout?.duration} min •{" "}
-                                        {dayWorkout.workout?.difficulty}
+                                        {dayWorkout.workout?.duration} min
                                       </p>
                                     </>
                                   ) : (
@@ -521,193 +437,170 @@ export default function AssignRoutinesPage() {
                           );
                         })}
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Assign Workout */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Plus className="h-5 w-5" />
-                        Assign Workout
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Dialog
-                        open={isAssignDialogOpen}
-                        onOpenChange={setIsAssignDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            className="w-full"
-                            disabled={
-                              getAvailableDays(selectedUser.id).length === 0
-                            }
-                          >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Assign New Workout
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Assign Workout to {selectedUser.name}
-                            </DialogTitle>
-                            <DialogDescription>
-                              Select a workout routine and assign it to an
-                              available day of the week.
-                            </DialogDescription>
-                          </DialogHeader>
-
-                          <div className="grid gap-6 py-4">
-                            {/* Day Selection */}
-                            <div className="space-y-4">
-                              <Label>Select Day of Week</Label>
-                              <div className="grid grid-cols-7 gap-2">
-                                {daysOfWeek.map((day) => {
-                                  const isOccupied = getOccupiedDays(
-                                    selectedUser.id,
-                                  ).includes(day.key);
-                                  const isSelected = selectedDay === day.key;
-
-                                  return (
-                                    <button
-                                      key={day.key}
-                                      type="button"
-                                      disabled={isOccupied}
-                                      onClick={() => setSelectedDay(day.key)}
-                                      className={`rounded-lg border p-3 text-center transition-colors ${
-                                        isOccupied
-                                          ? "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-                                          : isSelected
-                                            ? "border-primary bg-primary text-primary-foreground"
-                                            : "hover:bg-muted/50 border-border"
-                                      }`}
-                                    >
-                                      <div className="text-xs font-medium">
-                                        {day.short}
-                                      </div>
-                                      <div className="mt-1 text-xs">
-                                        {isOccupied ? "Occupied" : "Available"}
-                                      </div>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                              {getAvailableDays(selectedUser.id).length ===
-                                0 && (
-                                <p className="text-muted-foreground py-2 text-center text-sm">
-                                  All days are occupied. Remove existing
-                                  workouts to assign new ones.
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Workout Selection */}
-                            <div className="space-y-4">
-                              <Label>Select Workout</Label>
-                              <div className="grid max-h-96 gap-3 overflow-y-auto">
-                                {mockWorkouts.map((workout) => {
-                                  const isRecommended =
-                                    selectedDay &&
-                                    workout.preferredDays.includes(selectedDay);
-
-                                  return (
-                                    <div
-                                      key={workout.id}
-                                      className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
-                                        //@ts-expect-error - TODO: FIX selectedWorkout is of type unknown
-                                        selectedWorkout?.id === workout.id
-                                          ? "border-primary bg-primary/5"
-                                          : "hover:bg-muted/50"
-                                      }`}
-                                      onClick={() =>
-                                        setSelectedWorkout(workout)
-                                      }
-                                    >
-                                      {isRecommended && (
-                                        <Badge className="absolute top-2 right-2 bg-green-500 text-xs">
-                                          Recommended
-                                        </Badge>
-                                      )}
-                                      <div className="mb-2 flex items-center justify-between">
-                                        <h4 className="font-medium">
-                                          {workout.name}
-                                        </h4>
-                                        <div className="flex items-center gap-2">
-                                          <Badge variant="outline">
-                                            {workout.difficulty}
-                                          </Badge>
-                                          <Badge variant="secondary">
-                                            <Clock className="mr-1 h-3 w-3" />
-                                            {workout.duration} min
-                                          </Badge>
-                                        </div>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <p className="text-muted-foreground text-sm">
-                                          {workout.exercises.length} exercises
-                                        </p>
-                                        <div className="flex flex-wrap gap-1">
-                                          {workout.muscleGroups.map((group) => (
-                                            <Badge
-                                              key={group}
-                                              variant="outline"
-                                              className="text-xs"
-                                            >
-                                              {group}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                        <div className="text-muted-foreground text-xs">
-                                          <span className="font-medium">
-                                            Recommended days:
-                                          </span>{" "}
-                                          {workout.preferredDays
-                                            .map(
-                                              (day) =>
-                                                daysOfWeek.find(
-                                                  (d) => d.key === day,
-                                                )?.label,
-                                            )
-                                            .join(", ")}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-
-                          <DialogFooter>
+                      <div className="mt-4">
+                        <Dialog
+                          open={isAssignDialogOpen}
+                          onOpenChange={setIsAssignDialogOpen}
+                        >
+                          <DialogTrigger asChild>
                             <Button
-                              onClick={handleAssignWorkout}
-                              disabled={
-                                !selectedWorkout || !selectedDay || isAssigning
-                              }
+                              className="w-full"
+                              disabled={getAvailableDays().length === 0}
                             >
-                              {isAssigning ? (
-                                <>
-                                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                  Assigning...
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  Assign to{" "}
-                                  {selectedDay &&
-                                    daysOfWeek.find(
-                                      (d) => d.key === selectedDay,
-                                    )?.label}
-                                </>
-                              )}
+                              <Plus className="mr-2 h-4 w-4" />
+                              Assign New Workout
                             </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Assign Workout to {selectedUser.name}
+                              </DialogTitle>
+                              <DialogDescription>
+                                Select a workout routine and assign it to an
+                                available day of the week.
+                              </DialogDescription>
+                            </DialogHeader>
 
-                      {getAvailableDays(selectedUser.id).length === 0 && (
+                            <div className="grid gap-6 py-4">
+                              {/* Day Selection */}
+                              <div className="space-y-4">
+                                <Label>Select Day of Week</Label>
+                                <div className="grid grid-cols-7 gap-2">
+                                  {daysOfWeek.map((day) => {
+                                    const isOccupied =
+                                      getOccupiedDays().includes(day.key);
+                                    const isSelected = selectedDay === day.key;
+
+                                    return (
+                                      <button
+                                        key={day.key}
+                                        type="button"
+                                        disabled={isOccupied}
+                                        onClick={() => setSelectedDay(day.key)}
+                                        className={`cursor-pointer rounded-lg border p-1 text-center transition-colors ${
+                                          isOccupied
+                                            ? "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                                            : isSelected
+                                              ? "border-primary bg-primary text-primary-foreground"
+                                              : "hover:bg-muted/50 border-border"
+                                        }`}
+                                      >
+                                        <div className="text-xs font-medium">
+                                          {day.short}
+                                        </div>
+                                        <div className="mt-1 text-xs">
+                                          {isOccupied
+                                            ? "Occupied"
+                                            : "Available"}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                {getAvailableDays().length === 0 && (
+                                  <p className="text-muted-foreground py-2 text-center text-sm">
+                                    All days are occupied. Remove existing
+                                    workouts to assign new ones.
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Workout Selection */}
+                              <div className="space-y-4">
+                                <Label>Select Workout</Label>
+                                <div className="grid max-h-96 gap-3 overflow-y-auto">
+                                  {workouts.map((workout) => {
+                                    return (
+                                      <div
+                                        key={workout.id}
+                                        className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
+                                          selectedWorkout?.id === workout.id
+                                            ? "border-primary bg-primary/5"
+                                            : "hover:bg-muted/50"
+                                        }`}
+                                        onClick={() =>
+                                          setSelectedWorkout(workout)
+                                        }
+                                      >
+                                        <div className="mb-2 flex items-center justify-between">
+                                          <h4 className="font-medium">
+                                            {workout.name}
+                                          </h4>
+                                          <div className="flex items-center gap-2">
+                                            <Badge variant="secondary">
+                                              <Clock className="mr-1 h-3 w-3" />
+                                              {workout.duration} min
+                                            </Badge>
+                                          </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                          <p className="text-muted-foreground text-sm">
+                                            {workout.workoutExercises.length}{" "}
+                                            exercises
+                                          </p>
+                                          <div className="flex flex-wrap gap-1">
+                                            {Array.from(
+                                              new Set(
+                                                ...workout.workoutExercises.map(
+                                                  (exercise) => {
+                                                    return exercise.exercise.muscleGroups.split(
+                                                      ",",
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                              .flat()
+                                              .map((muscleGroup) => (
+                                                <Badge
+                                                  key={muscleGroup}
+                                                  variant="outline"
+                                                  className="text-xs"
+                                                >
+                                                  {muscleGroup}
+                                                </Badge>
+                                              ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+
+                            <DialogFooter>
+                              <Button
+                                onClick={handleAssignWorkout}
+                                disabled={
+                                  !selectedWorkout ||
+                                  !selectedDay ||
+                                  isAssigning
+                                }
+                              >
+                                {isAssigning ? (
+                                  <>
+                                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                    Assigning...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    Assign to{" "}
+                                    {selectedDay &&
+                                      daysOfWeek.find(
+                                        (d) => d.key === selectedDay,
+                                      )?.label}
+                                  </>
+                                )}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+
+                      {getAvailableDays().length === 0 && (
                         <p className="text-muted-foreground mt-2 text-center text-xs">
                           All days are occupied. Remove existing workouts to
                           assign new ones.
