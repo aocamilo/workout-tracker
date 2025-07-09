@@ -192,6 +192,10 @@ export const workouts = createTable("workout", (d) => ({
   id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
   name: d.varchar({ length: 255 }).notNull(),
   duration: d.integer().notNull(),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 }));
 
 export const workoutsRelations = relations(workouts, ({ many }) => ({

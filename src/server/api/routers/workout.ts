@@ -2,7 +2,12 @@ import { inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { exercises, workoutExercises, workouts } from "@/server/db/schema";
+import {
+  exercises,
+  userWorkouts,
+  workoutExercises,
+  workouts,
+} from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export const workoutSchema = z.object({
@@ -131,10 +136,17 @@ export const workoutRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
+      // First delete associated user workouts
+      await ctx.db
+        .delete(userWorkouts)
+        .where(eq(userWorkouts.workoutId, input.id));
+
+      // Then delete associated workout exercises
       await ctx.db
         .delete(workoutExercises)
         .where(eq(workoutExercises.workoutId, input.id));
 
+      // Finally delete the workout
       await ctx.db.delete(workouts).where(eq(workouts.id, input.id));
 
       return { success: true };

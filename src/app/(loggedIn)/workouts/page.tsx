@@ -27,152 +27,38 @@ import {
   Dumbbell,
 } from "lucide-react";
 import Link from "next/link";
-
-// Mock existing workouts data
-const mockWorkouts = [
-  {
-    id: 1,
-    name: "Upper Body Strength",
-    duration: 45,
-    exercises: [
-      {
-        id: 1,
-        name: "Push-Up",
-        sets: 3,
-        reps: 12,
-        muscleGroups: "chest,triceps,shoulders,core",
-      },
-      {
-        id: 4,
-        name: "Bench Press",
-        sets: 4,
-        reps: 8,
-        muscleGroups: "chest,triceps,shoulders",
-      },
-      {
-        id: 2,
-        name: "Pull-Up",
-        sets: 3,
-        reps: 8,
-        muscleGroups: "back,biceps,shoulders,core",
-      },
-      { id: 7, name: "Bicep Curl", sets: 3, reps: 12, muscleGroups: "biceps" },
-    ],
-    createdAt: "2024-01-15",
-  },
-  {
-    id: 2,
-    name: "Lower Body Power",
-    duration: 60,
-    exercises: [
-      {
-        id: 3,
-        name: "Squat",
-        sets: 4,
-        reps: 10,
-        muscleGroups: "quadriceps,glutes,hamstrings,core",
-      },
-      {
-        id: 5,
-        name: "Deadlift",
-        sets: 4,
-        reps: 6,
-        muscleGroups: "back,glutes,hamstrings,core",
-      },
-      {
-        id: 9,
-        name: "Lunge",
-        sets: 3,
-        reps: 12,
-        muscleGroups: "quadriceps,glutes,hamstrings,core",
-      },
-    ],
-    createdAt: "2024-01-12",
-  },
-  {
-    id: 3,
-    name: "Full Body Circuit",
-    duration: 30,
-    exercises: [
-      {
-        id: 1,
-        name: "Push-Up",
-        sets: 3,
-        reps: 15,
-        muscleGroups: "chest,triceps,shoulders,core",
-      },
-      {
-        id: 3,
-        name: "Squat",
-        sets: 3,
-        reps: 20,
-        muscleGroups: "quadriceps,glutes,hamstrings,core",
-      },
-      {
-        id: 10,
-        name: "Plank",
-        sets: 3,
-        reps: 30,
-        muscleGroups: "core,shoulders,glutes",
-      },
-      {
-        id: 9,
-        name: "Lunge",
-        sets: 3,
-        reps: 16,
-        muscleGroups: "quadriceps,glutes,hamstrings,core",
-      },
-    ],
-    createdAt: "2024-01-10",
-  },
-  {
-    id: 4,
-    name: "Core Blast",
-    duration: 25,
-    exercises: [
-      {
-        id: 10,
-        name: "Plank",
-        sets: 4,
-        reps: 45,
-        muscleGroups: "core,shoulders,glutes",
-      },
-    ],
-    createdAt: "2024-01-08",
-  },
-];
+import { api } from "@/trpc/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function WorkoutsPage() {
-  const [workouts, setWorkouts] = useState(mockWorkouts);
+  const { data: workouts = [] } = api.workout.getAll.useQuery();
   const [searchTerm, setSearchTerm] = useState("");
-
+  const queryClient = useQueryClient();
   const filteredWorkouts = workouts.filter((workout) =>
     workout.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const deleteWorkout = async (workoutId: number) => {
-    // This would be your actual API call to delete the workout
-    setWorkouts((prev) => prev.filter((workout) => workout.id !== workoutId));
+  const { mutate: deleteWorkout } = api.workout.delete.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
+    },
+  });
 
-    // Example API call:
-    // await fetch(`/api/workouts/${workoutId}`, { method: 'DELETE' })
+  const getTotalExercises = (workout: (typeof workouts)[0]) => {
+    return workout.workoutExercises.length;
   };
 
-  const getTotalExercises = (workout: (typeof mockWorkouts)[0]) => {
-    return workout.exercises.length;
-  };
-
-  const getTotalSets = (workout: (typeof mockWorkouts)[0]) => {
-    return workout.exercises.reduce(
+  const getTotalSets = (workout: (typeof workouts)[0]) => {
+    return workout.workoutExercises.reduce(
       (total, exercise) => total + exercise.sets,
       0,
     );
   };
 
-  const getUniqueMusclGroups = (workout: (typeof mockWorkouts)[0]) => {
+  const getUniqueMuscleGroups = (workout: (typeof workouts)[0]) => {
     const muscleGroups = new Set<string>();
-    workout.exercises.forEach((exercise) => {
-      exercise.muscleGroups.split(",").forEach((group) => {
+    workout.workoutExercises.forEach((exercise) => {
+      exercise.exercise.muscleGroups.split(",").forEach((group) => {
         muscleGroups.add(group.trim());
       });
     });
@@ -265,7 +151,7 @@ export default function WorkoutsPage() {
                 <div>
                   <p className="mb-2 text-sm font-medium">Target Muscles:</p>
                   <div className="flex flex-wrap gap-1">
-                    {getUniqueMusclGroups(workout).map((group) => (
+                    {getUniqueMuscleGroups(workout).map((group) => (
                       <Badge
                         key={group}
                         variant="secondary"
@@ -274,11 +160,11 @@ export default function WorkoutsPage() {
                         {group.charAt(0).toUpperCase() + group.slice(1)}
                       </Badge>
                     ))}
-                    {getUniqueMusclGroups(workout).length <
+                    {getUniqueMuscleGroups(workout).length <
                       Array.from(
                         new Set(
-                          workout.exercises.flatMap((ex) =>
-                            ex.muscleGroups.split(","),
+                          workout.workoutExercises.flatMap((ex) =>
+                            ex.exercise.muscleGroups.split(","),
                           ),
                         ),
                       ).length && (
@@ -286,8 +172,8 @@ export default function WorkoutsPage() {
                         +
                         {Array.from(
                           new Set(
-                            workout.exercises.flatMap((ex) =>
-                              ex.muscleGroups.split(","),
+                            workout.workoutExercises.flatMap((ex) =>
+                              ex.exercise.muscleGroups.split(","),
                             ),
                           ),
                         ).length - 3}{" "}
@@ -302,7 +188,7 @@ export default function WorkoutsPage() {
                   <p className="mb-2 text-sm font-medium">Exercises:</p>
                   <ScrollArea className="h-20">
                     <div className="space-y-1">
-                      {workout.exercises.map((exercise) => (
+                      {workout.workoutExercises.map((exercise) => (
                         <div
                           key={exercise.id}
                           className="flex justify-between text-sm"
@@ -360,7 +246,7 @@ export default function WorkoutsPage() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => deleteWorkout(workout.id)}
+                          onClick={() => deleteWorkout({ id: workout.id })}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                           Delete
